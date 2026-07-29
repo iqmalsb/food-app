@@ -25,5 +25,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Paginator::useBootstrap();
+
+        if (config('database.default') === 'mysql') {
+            try {
+                \Illuminate\Support\Facades\DB::statement('SET SESSION sql_require_primary_key=0');
+            } catch (\Exception $e) {
+                // Ignore
+            }
+        }
     }
 }
