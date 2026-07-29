@@ -1,0 +1,142 @@
+name: Laravel CI/CD
+
+on:
+  push:
+    branches: [ master, staging, chore/ci-cd ]
+  pull_request:
+    branches: [ master, staging ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.5'
+        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd
+        coverage: none
+
+    - name: Get Composer Cache Directory
+      id: composer-cache
+      run: |
+        echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+    - name: Cache Composer Dependencies
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-composer-
+
+    - name: Install Composer Dependencies
+      run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install NPM Dependencies & Build Assets
+      run: |
+        npm ci
+        npm run build
+
+    - name: Copy Env File
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+    - name: Generate App Key
+      run: php artisan key:generate
+
+    - name: Run Tests
+      run: ./vendor/bin/pest
+
+  deploy:
+    needs: tests
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/staging' && github.event_name == 'push'
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.5'
+        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd
+        coverage: none
+
+    - name: Install Production Composer Dependencies
+      run: composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install NPM & Compile Production Assets
+      run: |
+        npm ci
+        npm run build
+
+    - name: Create Release Archive
+      run: tar -czf release.tar.gz --exclude='.git' --exclude='node_modules' --exclude='release.tar.gz' .
+
+    - name: Upload Release Archive to VPS
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.SSH_PORT || 22 }}
+        source: "release.tar.gz"
+        target: "${{ secrets.DEPLOY_PATH }}"
+
+    - name: Extract & Activate Zero-Downtime Release on VPS
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.SSH_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: ${{ secrets.SSH_PORT || 22 }}
+        script: |
+          DEPLOY_PATH="${{ secrets.DEPLOY_PATH }}"
+          RELEASE_NAME=$(date +%Y%m%d%H%M%S)
+          RELEASES_PATH="$DEPLOY_PATH/releases/$RELEASE_NAME"
+          SHARED_PATH="$DEPLOY_PATH/shared"
+
+          # 1. Create releases path
+          mkdir -p "$RELEASES_PATH"
+
+          # 2. Extract build archive
+          tar -xzf "$DEPLOY_PATH/release.tar.gz" -C "$RELEASES_PATH"
+          rm -f "$DEPLOY_PATH/release.tar.gz"
+
+          # 3. Link shared files (.env and storage)
+          ln -sfn "$SHARED_PATH/.env" "$RELEASES_PATH/.env"
+          rm -rf "$RELEASES_PATH/storage"
+          ln -sfn "$SHARED_PATH/storage" "$RELEASES_PATH/storage"
+
+          # 4. Sync file permissions for web server
+          chown -R www-data:www-data "$RELEASES_PATH"
+          chmod -R 775 "$RELEASES_PATH"
+
+          # 5. Run migrations & Optimize caching
+          cd "$RELEASES_PATH"
+          php artisan migrate --force
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+
+          # 6. Atomic swap: redirect Nginx to the new release
+          ln -sfn "$RELEASES_PATH" "$DEPLOY_PATH/current"
+
+          # 7. Keep last 5 releases, delete older ones
+          cd "$DEPLOY_PATH/releases" && ls -t | tail -n +6 | xargs rm -rf
