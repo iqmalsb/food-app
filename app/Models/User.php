@@ -9,9 +9,11 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class User extends Authenticatable Implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -19,9 +21,20 @@ class User extends Authenticatable Implements MustVerifyEmail
      * @var array<int, string>
      */
     protected $fillable = [
+        'organisation_id',
         'name',
         'email',
         'password',
+        'role',
+        'position',
+        'contact_no',
+        'image',
+        'address_line1',
+        'address_line2',
+        'address_line3',
+        'address_city',
+        'address_state',
+        'address_postcode',
     ];
 
     /**
@@ -45,5 +58,9 @@ class User extends Authenticatable Implements MustVerifyEmail
 
     public function orders() {
         return $this->hasMany(Order::class);
+    }
+
+    public function organisation() {
+        return $this->belongsTo(Organisation::class);
     }
 }

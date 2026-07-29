@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('tables', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('organisation_id')->constrained()->onDelete('cascade');
             $table->string('table_no');
             $table->tinyInteger('max_pax');
             $table->string('status');

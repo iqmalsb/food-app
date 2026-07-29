@@ -44,3 +44,25 @@ Route::post('/tables/store', [App\Http\Controllers\TableController::class, 'stor
 Route::get('/tables/{table}', [App\Http\Controllers\TableController::class, 'show'])->name('tables.show');
 Route::post('/tables/{table}/update', [App\Http\Controllers\TableController::class, 'update'])->name('tables.update');
 Route::get('/tables/{table}/delete', [App\Http\Controllers\TableController::class, 'delete'])->name('tables.delete');
+
+// User CRUD Management Routes (Gated by Admin)
+Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+    Route::get('/users', [App\Http\Controllers\UserController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [App\Http\Controllers\UserController::class, 'create'])->name('users.create');
+    Route::post('/users/store', [App\Http\Controllers\UserController::class, 'store'])->name('users.store');
+    Route::get('/users/{user}', [App\Http\Controllers\UserController::class, 'show'])->name('users.show');
+    Route::post('/users/{user}/update', [App\Http\Controllers\UserController::class, 'update'])->name('users.update');
+    Route::get('/users/{user}/delete', [App\Http\Controllers\UserController::class, 'delete'])->name('users.delete');
+});
+
+// Organisation CRUD Management Routes (Gated by Superadmin)
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/organisations', [App\Http\Controllers\OrganisationController::class, 'index'])->name('organisations.index');
+    Route::get('/organisations/create', [App\Http\Controllers\OrganisationController::class, 'create'])->name('organisations.create');
+    Route::post('/organisations/store', [App\Http\Controllers\OrganisationController::class, 'store'])->name('organisations.store');
+    Route::get('/organisations/{organisation}', [App\Http\Controllers\OrganisationController::class, 'show'])->name('organisations.show');
+    Route::post('/organisations/{organisation}/update', [App\Http\Controllers\OrganisationController::class, 'update'])->name('organisations.update');
+    Route::get('/organisations/{organisation}/delete', [App\Http\Controllers\OrganisationController::class, 'delete'])->name('organisations.delete');
+});
+
+
