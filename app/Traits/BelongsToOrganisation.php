@@ -23,6 +23,9 @@ trait BelongsToOrganisation
             if (auth()->check()) {
                 $user = auth()->user();
                 if ($user->role === 'superadmin') {
+                    if ($orgId = static::getCurrentOrganisationId()) {
+                        $builder->where($builder->getQuery()->from . '.organisation_id', $orgId);
+                    }
                     return;
                 }
                 if ($user->organisation_id) {

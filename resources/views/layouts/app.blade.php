@@ -28,6 +28,18 @@
 <body>
     <div id="app">
         @auth
+            @if(session()->has('original_superadmin_id'))
+                <div class="alert alert-warning text-center rounded-0 mb-0 py-2 border-0" style="background-color: #fef3c7; color: #92400e; font-size: 0.95rem; font-weight: bold; border-bottom: 1px solid #f59e0b !important; position: relative; z-index: 1050;">
+                    <i class="bi bi-person-fill-exclamation me-1"></i> 
+                    Simulating user: <strong>{{ Auth::user()->name }}</strong> ({{ ucfirst(str_replace('_', ' ', Auth::user()->role)) }}@if(Auth::user()->organisation) - {{ Auth::user()->organisation->name }}@endif)
+                    <form action="{{ route('users.stop-impersonation') }}" method="POST" class="d-inline ms-3">
+                        @csrf
+                        <button type="submit" class="btn btn-sm btn-outline-warning text-dark border-dark py-0 px-2" style="font-size: 0.8rem; font-weight: bold;">
+                            Exit Simulation
+                        </button>
+                    </form>
+                </div>
+            @endif
             <div id="wrapper">
                 <!-- Sidebar -->
                 <div id="sidebar-wrapper">
@@ -69,13 +81,32 @@
                             <span class="navbar-brand d-none d-md-inline-block">{{ config('app.name', 'DineFlow') }}</span>
 
                             <div class="ms-auto d-flex align-items-center">
-                                <span class="me-3 text-secondary d-none d-sm-inline" style="font-size: 0.9rem;">
-                                    @if(Auth::user()->organisation)
-                                        <i class="bi bi-building"></i> {{ Auth::user()->organisation->name }}
-                                    @else
-                                        <i class="bi bi-shield-lock"></i> Global Admin
-                                    @endif
-                                </span>
+                                @if(Auth::user()->role === 'superadmin')
+                                    <div class="me-3 d-inline-block">
+                                        <form id="switch-org-form" action="{{ route('organisations.switch') }}" method="POST" class="d-flex align-items-center m-0">
+                                            @csrf
+                                            <label for="active_org_select" class="me-2 text-secondary d-none d-sm-inline" style="font-size: 0.9rem; white-space: nowrap;">
+                                                <i class="bi bi-building text-primary"></i> Active Tenant:
+                                            </label>
+                                            <select name="organisation_id" id="active_org_select" onchange="document.getElementById('switch-org-form').submit()" class="form-select form-select-sm border-primary" style="max-width: 200px;">
+                                                <option value="">-- All (Global View) --</option>
+                                                @foreach(\App\Models\Organisation::all() as $org)
+                                                    <option value="{{ $org->id }}" {{ session('current_organisation_id') == $org->id ? 'selected' : '' }}>
+                                                        {{ $org->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </form>
+                                    </div>
+                                @else
+                                    <span class="me-3 text-secondary d-none d-sm-inline" style="font-size: 0.9rem;">
+                                        @if(Auth::user()->organisation)
+                                            <i class="bi bi-building"></i> {{ Auth::user()->organisation->name }}
+                                        @else
+                                            <i class="bi bi-shield-lock"></i> Global Admin
+                                        @endif
+                                    </span>
+                                @endif
 
                                 <div class="dropdown">
                                     <a id="navbarDropdown" class="nav-link dropdown-toggle font-weight-bold" href="#" role="button"

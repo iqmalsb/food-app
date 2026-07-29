@@ -84,4 +84,23 @@ class OrganisationController extends Controller
             'alert-message' => 'Organisation deleted successfully',
         ]);
     }
+
+    public function switch(Request $request)
+    {
+        $orgId = $request->input('organisation_id');
+
+        if ($orgId) {
+            $organisation = Organisation::findOrFail($orgId);
+            session(['current_organisation_id' => $organisation->id]);
+            $msg = "Switched to context of {$organisation->name}";
+        } else {
+            session()->forget('current_organisation_id');
+            $msg = "Cleared active tenant context. Now viewing global data.";
+        }
+
+        return back()->with([
+            'alert-type' => 'alert-success',
+            'alert-message' => $msg,
+        ]);
+    }
 }

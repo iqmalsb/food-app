@@ -79,6 +79,12 @@
                                     <td>{{ $user->created_at->format('Y-m-d H:i') }}</td>
                                     <td>
                                         <a href="{{ route('users.show', $user) }}" class="btn btn-sm btn-info">Details</a>
+                                        @if(auth()->user()->role === 'superadmin' && auth()->id() !== $user->id && $user->role !== 'superadmin')
+                                            <form action="{{ route('users.impersonate', $user) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-warning text-dark">Simulate</button>
+                                            </form>
+                                        @endif
                                         @if(auth()->id() !== $user->id)
                                             <a href="{{ route('users.delete', $user) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
                                         @endif
