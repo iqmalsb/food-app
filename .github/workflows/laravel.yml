@@ -87,7 +87,9 @@ jobs:
         npm run prod
 
     - name: Create Release Archive
-      run: tar -czf release.tar.gz --exclude='.git' --exclude='node_modules' --exclude='release.tar.gz' .
+      run: |
+        tar -czf /tmp/release.tar.gz --exclude='.git' --exclude='node_modules' .
+        mv /tmp/release.tar.gz .
 
     - name: Upload Release Archive to VPS
       uses: appleboy/scp-action@v0.1.7
