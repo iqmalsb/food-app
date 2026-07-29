@@ -8,7 +8,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'DineFlow') }}</title>
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
@@ -19,32 +19,106 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/sidebar.css') }}" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 
 <body>
     <div id="app">
-        <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/home') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+        @auth
+            <div id="wrapper">
+                <!-- Sidebar -->
+                <div id="sidebar-wrapper">
+                    <div class="sidebar-heading">DINEFLOW</div>
+                    <div class="list-group list-group-flush">
+                        <a href="{{ route('home') }}" class="list-group-item list-group-item-action {{ request()->routeIs('home') ? 'active' : '' }}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                        <a href="{{ route('food.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('food.*') ? 'active' : '' }}">
+                            <i class="bi bi-egg-fried"></i> Food Items
+                        </a>
+                        <a href="{{ route('categories.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                            <i class="bi bi-tags"></i> Categories
+                        </a>
+                        <a href="{{ route('tables.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('tables.*') ? 'active' : '' }}">
+                            <i class="bi bi-grid-3x3-gap"></i> Table Layout
+                        </a>
+                        @if (in_array(Auth::user()->role, ['superadmin', 'org_admin', 'admin']))
+                            <a href="{{ route('users.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                                <i class="bi bi-people"></i> Users
+                            </a>
+                        @endif
+                        @if (Auth::user()->role === 'superadmin')
+                            <a href="{{ route('organisations.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('organisations.*') ? 'active' : '' }}">
+                                <i class="bi bi-building"></i> Organisations
+                            </a>
+                        @endif
+                    </div>
+                </div>
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
-                        <li>Home</li>
-                        <li></li>
-                    </ul>
+                <!-- Page Content Wrapper -->
+                <div id="page-content-wrapper">
+                    <!-- Top Navbar -->
+                    <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm py-2">
+                        <div class="container-fluid">
+                            <button class="menu-toggle-btn me-3" id="menu-toggle">
+                                <i class="bi bi-justify"></i>
+                            </button>
+                            <span class="navbar-brand d-none d-md-inline-block">{{ config('app.name', 'DineFlow') }}</span>
 
-                    <!-- Right Side Of Navbar -->
-                    <ul class="navbar-nav ms-auto">
-                        <!-- Authentication Links -->
-                        @guest
+                            <div class="ms-auto d-flex align-items-center">
+                                <span class="me-3 text-secondary d-none d-sm-inline" style="font-size: 0.9rem;">
+                                    @if(Auth::user()->organisation)
+                                        <i class="bi bi-building"></i> {{ Auth::user()->organisation->name }}
+                                    @else
+                                        <i class="bi bi-shield-lock"></i> Global Admin
+                                    @endif
+                                </span>
+
+                                <div class="dropdown">
+                                    <a id="navbarDropdown" class="nav-link dropdown-toggle font-weight-bold" href="#" role="button"
+                                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        {{ Auth::user()->name }}
+                                    </a>
+
+                                    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                        <a class="dropdown-item" href="{{ route('logout') }}"
+                                            onclick="event.preventDefault();
+                                            document.getElementById('logout-form').submit();">
+                                            {{ __('Logout') }}
+                                        </a>
+
+                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                            @csrf
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </nav>
+
+                    <main class="py-4 px-3">
+                        @yield('content')
+                    </main>
+                </div>
+            </div>
+        @else
+            <!-- Guest Layout (Login, Register, Welcome) -->
+            <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
+                <div class="container">
+                    <a class="navbar-brand" href="{{ url('/') }}">
+                        {{ config('app.name', 'DineFlow') }}
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav ms-auto">
                             @if (Route::has('login'))
                                 <li class="nav-item">
                                     <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
@@ -56,35 +130,38 @@
                                     <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
                                 </li>
                             @endif
-                        @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
-                                </a>
-
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                        onclick="event.preventDefault();
-                                        document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-                                    </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
-                        @endguest
-                    </ul>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
 
-        <main class="py-4">
-            @yield('content')
-        </main>
+            <main class="py-4">
+                @yield('content')
+            </main>
+        @endauth
     </div>
+
+    @auth
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const menuToggle = document.getElementById('menu-toggle');
+            const wrapper = document.getElementById('sidebar-wrapper');
+
+            // Apply persisted sidebar state
+            if (localStorage.getItem('sidebar-collapsed') === 'true') {
+                wrapper.classList.add('collapsed');
+            }
+
+            menuToggle.addEventListener('click', function (e) {
+                e.preventDefault();
+                wrapper.classList.toggle('collapsed');
+                // Persist state
+                const isCollapsed = wrapper.classList.contains('collapsed');
+                localStorage.setItem('sidebar-collapsed', isCollapsed);
+            });
+        });
+    </script>
+    @endauth
 </body>
 
 </html>
