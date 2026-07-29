@@ -1,64 +1,118 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+# DineFlow - Contactless Food Ordering & Restaurant Management System
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+DineFlow is a modern, high-fidelity contactless waiting, ordering, and payment application built with Laravel 13. It streamlines restaurant operations by combining table-top QR code ordering, self-service kiosks, and staff-facing iPad POS terminals into a single, real-time database engine.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Key App Features & User Matrix
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+DineFlow coordinates multiple user roles through specific routing and interface architectures:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```mermaid
+graph TD
+    A[Database / Core Engine] --> B[Admin: Web Dashboard]
+    A --> C[Manager: Org Management]
+    A --> D[Staff: iPad POS / Web API]
+    A --> E[Customer: Kiosk / Mobile BYOD Web]
+```
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## 🛠️ Feature Roadmap & Implementation Status
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Below is the status of DineFlow's feature roadmap, organized by user types:
 
-## Laravel Sponsors
+### 1. Admin (Super Admin / System Wide)
+*Admin users manage system configurations, global parameters, and system-wide resources via web routes.*
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+- [x] **Core System Scaffolding**: Configured with Laravel 13 running on SQLite for local development.
+- [x] **Role-Based Authentication**: Secure registration and login routes with verification gates.
+- [x] **Unified Database Seeders**: Instantly seed tables, food categories, and menu items.
+- [x] **Global Food Menu CRUD**: Add, edit, display, and delete menu items globally.
+- [x] **Category Management CRUD**: Dynamic food categorization interface.
+- [x] **Table Management CRUD**: Register and track physical dining tables.
+- [ ] **Merchants Listing/Registration (CRUD)**: Manage registered merchant profiles and restaurants on the platform.
+- [ ] **User Listing/Registration (CRUD)**: Manage and provision platform users and administrative roles.
+- [ ] **Features Listing (CRUD)**: Manage operational feature availability dynamically across merchants.
+- [ ] **System Analytics Dashboard**: View aggregate platform transaction volume and signup rates.
 
-### Premium Partners
+### 2. Manager (Organization / Store-Wide)
+*Managers configure their specific branch layouts, custom branding, menus, and track local store operations via web routes.*
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+- [x] **Menu & Category Configuration**: Adjust specific items and categories active at the branch level.
+- [x] **Physical Table Layout Configuration**: Modify and add new dine-in table layouts.
+- [ ] **Real-time Store Performance Charts**: Interactive graphs tracking daily sales, average order value, and peak dining hours.
+- [ ] **Staff Account Provisioning**: Invite and manage permissions for local store staff (waiters/cooks).
+- [ ] **Discount & Promo Creator**: Create custom promo codes and happy hour menu pricing.
 
-## Contributing
+### 3. Staff (Waiters, Cooks, and Cashiers)
+*Staff manage active tables, record tableside orders, and fulfill kitchen tickets. Accessible via API (iPad/tablet browser) or Web routes.*
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- [x] **Authentication & Verification**: Login flow verifying staff role permissions.
+- [ ] **Waiter iPad POS Interface**: Tap-to-order tableside app showing interactive table maps.
+- [ ] **Live Kitchen Display System (KDS)**: Real-time ticket board for chefs with order prep timer.
+- [ ] **Active Order Management**: Edit, split, or cancel active tableside tickets before checkout.
+- [ ] **Printer & Hardware Integration**: Push kitchen and receipt slips directly to network printers.
 
-## Code of Conduct
+### 4. Customer (Guest / Kiosk / BYOD Mobile)
+*Non-login guests browsing the menu, submitting orders, and completing checkouts. Accessible via Customer Mobile Browser (BYOD) or Kiosk terminals.*
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- [x] **DineFlow Landing Page**: High-performance, responsive homepage introducing features and product demo requests.
+- [x] **Menu Browsing & Intrinsic Layouts**: View category-sorted menu items with images, pricing, and ingredients.
+- [ ] **QR Code Table Scanner / BYOD Link**: Read table-specific QR codes to auto-assign orders to a physical table.
+- [ ] **Cart & Item Customization**: Add, remove, or modify items (e.g. choice of sauce, preparation style).
+- [ ] **Kiosk Terminal Interface**: High-throughput self-service layout for walk-in/takeaway orders.
+- [ ] **Integrated Payment Gateway**: Seamless payment checkouts via Stripe, Apple Pay, and Google Pay.
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 💻 Tech Stack & Dependencies
 
-## License
+- **Framework**: Laravel 13 (AI-Native Engine)
+- **Database**: SQLite (Local/Non-prod), MySQL/PostgreSQL (Production)
+- **Testing**: Pest PHP (v4.x) / PHPUnit (v12.x)
+- **Error Pages**: Spatie Laravel Ignition (v2.x)
+- **API Engine**: Laravel Sanctum (v4.x)
+- **Scaffolding**: Laravel UI (v4.x)
+- **Styling**: Vanilla CSS (landing page configured in `public/css/landing.css`)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## ⚙️ Getting Started (Local Development)
+
+### 1. Requirements
+Ensure you are running **PHP 8.3 or higher** (e.g., via Laravel Herd on macOS).
+
+### 2. Installation
+Clone the repository and install the Composer dependencies:
+```bash
+composer install
+```
+
+### 3. Database Migration & Seeding
+Configure your environment. The local database will dynamically default to SQLite. Build the schema and seed default data:
+```bash
+# Creates the database file
+touch database/database.sqlite
+
+# Runs migrations and seeds categories, tables, foods, and a default admin user
+php artisan migrate --seed
+```
+
+The seeder will automatically create a default admin account:
+- **Email**: `admin@foodapp.com`
+- **Password**: `password`
+- **Role**: `admin`
+
+### 4. Running the Dev Server
+Start Herd or run the built-in Artisan dev server:
+```bash
+php artisan serve
+```
+Open **[http://food-app.test](http://food-app.test)** (or the localhost address) in your browser to view the application.
+
+### 5. Running Tests
+Verify database and application integrity by running the Pest test suite:
+```bash
+vendor/bin/pest
+```
