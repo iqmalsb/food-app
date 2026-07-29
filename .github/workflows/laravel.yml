@@ -46,7 +46,7 @@ jobs:
     - name: Install NPM Dependencies & Build Assets
       run: |
         npm ci
-        npm run build
+        npm run prod
 
     - name: Copy Env File
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
@@ -84,7 +84,7 @@ jobs:
     - name: Install NPM & Compile Production Assets
       run: |
         npm ci
-        npm run build
+        npm run prod
 
     - name: Create Release Archive
       run: tar -czf release.tar.gz --exclude='.git' --exclude='node_modules' --exclude='release.tar.gz' .
