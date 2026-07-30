@@ -20,12 +20,7 @@
                     <a href="{{ route('home') }}" class="btn btn-sm btn-outline-secondary">Back to Dashboard</a>
                 </div>
 
-                @if (session()->has('alert-message'))
-                    <div class="alert {{ session()->get('alert-type') }} m-3">
-                        {{ session()->get('alert-message') }}
-                    </div>
-                @endif
-                
+
                 <div class="card-body">
                     <form action="{{ route('users.index') }}" method="GET">
                         <div class="input-group">
@@ -40,61 +35,69 @@
                 </div>
 
                 <div class="card-body">
-                    <table class="table table-hover">
-                        <thead>
-                          <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Role</th>
-                            @if(auth()->user()->role === 'superadmin')
-                                <th scope="col">Organisation</th>
-                            @endif
-                            <th scope="col">Position</th>
-                            <th scope="col">Created At</th>
-                            <th scope="col">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($users as $user)
-                                <tr>
-                                    <th scope="row">{{ $loop->iteration + ($users->firstItem() - 1) }}</th>
-                                    <td>{{ $user->name }}</td>
-                                    <td>{{ $user->email }}</td>
-                                    <td>
-                                        <span class="badge {{ $user->role === 'superadmin' ? 'bg-dark' : ($user->role === 'org_admin' ? 'bg-danger' : ($user->role === 'manager' ? 'bg-warning text-dark' : 'bg-success')) }}">
-                                            {{ ucfirst(str_replace('_', ' ', $user->role)) }}
-                                        </span>
-                                    </td>
-                                    @if(auth()->user()->role === 'superadmin')
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                              <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Role</th>
+                                @if(auth()->user()->role === 'superadmin')
+                                    <th scope="col">Organisation</th>
+                                @endif
+                                <th scope="col">Position</th>
+                                <th scope="col">Created At</th>
+                                <th scope="col">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($users as $user)
+                                    <tr>
+                                        <th scope="row">{{ $loop->iteration + ($users->firstItem() - 1) }}</th>
+                                        <td>{{ $user->name }}</td>
+                                        <td>{{ $user->email }}</td>
                                         <td>
-                                            @if($user->organisation)
-                                                <span class="badge bg-secondary">{{ $user->organisation->name }}</span>
-                                            @else
-                                                <span class="badge bg-dark">Global System</span>
+                                            <span class="badge {{ $user->role === 'superadmin' ? 'bg-dark' : ($user->role === 'org_admin' ? 'bg-danger' : ($user->role === 'manager' ? 'bg-warning text-dark' : 'bg-success')) }}">
+                                                {{ ucfirst(str_replace('_', ' ', $user->role)) }}
+                                            </span>
+                                        </td>
+                                        @if(auth()->user()->role === 'superadmin')
+                                            <td>
+                                                @if($user->organisation)
+                                                    <span class="badge bg-secondary">{{ $user->organisation->name }}</span>
+                                                @else
+                                                    <span class="badge bg-dark">Global System</span>
+                                                @endif
+                                            </td>
+                                        @endif
+                                        <td>{{ $user->position ?: '-' }}</td>
+                                        <td>{{ $user->created_at->format('Y-m-d H:i') }}</td>
+                                        <td>
+                                            <a href="{{ route('users.show', $user) }}" class="btn btn-sm btn-info">Details</a>
+                                            @if(auth()->user()->role === 'superadmin' && auth()->id() !== $user->id && $user->role !== 'superadmin')
+                                                <form action="{{ route('users.impersonate', $user) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-warning text-dark">Simulate</button>
+                                                </form>
+                                            @endif
+                                            @if(auth()->id() !== $user->id)
+                                                <a href="{{ route('users.delete', $user) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
                                             @endif
                                         </td>
-                                    @endif
-                                    <td>{{ $user->position ?: '-' }}</td>
-                                    <td>{{ $user->created_at->format('Y-m-d H:i') }}</td>
-                                    <td>
-                                        <a href="{{ route('users.show', $user) }}" class="btn btn-sm btn-info">Details</a>
-                                        @if(auth()->id() !== $user->id)
-                                            <a href="{{ route('users.delete', $user) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete</a>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="{{ auth()->user()->role === 'superadmin' ? 8 : 7 }}" class="text-center">No users found.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                      </table>
-                      
-                      <div class="d-flex justify-content-center">
-                          {{ $users->appends(request()->query())->links() }}
-                      </div>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="{{ auth()->user()->role === 'superadmin' ? 8 : 7 }}" class="text-center">No users found.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center">
+                        {{ $users->appends(request()->query())->links() }}
+                    </div>
                 </div>
             </div>
         </div>

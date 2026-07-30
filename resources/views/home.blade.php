@@ -4,6 +4,15 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
+            @php
+                $org = Auth::user()->organisation;
+            @endphp
+            @if($org && $org->banner_image)
+                <div class="org-banner-container">
+                    <img src="{{ asset('/storage/' . $org->banner_image) }}" class="org-banner-img" alt="Organisation Banner">
+                </div>
+            @endif
+
             <div class="card">
                 <div class="card-header">{{ __('Dashboard') }}</div>
 

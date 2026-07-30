@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        // Create Org Admin User (Merchant Root User)
+                // Create Org Admin User (Merchant Root User)
         \App\Models\User::firstOrCreate(
             ['email' => 'admin@foodapp.com'],
             [
@@ -50,5 +50,7 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        $this->call(OrganisationAndUserSeeder::class);
     }
 }

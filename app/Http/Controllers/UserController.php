@@ -12,7 +12,7 @@ class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'verified', 'admin']);
+        $this->middleware(['auth', 'verified', 'admin'])->except('stopImpersonation');
     }
 
     public function index(Request $request)
@@ -20,9 +20,14 @@ class UserController extends Controller
         $keyword = $request->keyword;
         $currentUser = auth()->user();
 
-        // If superadmin, they can query across all organisations
+        // If superadmin, they can query across all organisations or a selected active tenant
         if ($currentUser->role === 'superadmin') {
-            $query = User::withoutGlobalScopes();
+            $orgId = \App\Traits\BelongsToOrganisation::getCurrentOrganisationId();
+            if ($orgId) {
+                $query = User::withoutGlobalScopes()->where('organisation_id', $orgId);
+            } else {
+                $query = User::withoutGlobalScopes();
+            }
             if ($keyword) {
                 $query->where(function ($q) use ($keyword) {
                     $q->where('name', 'LIKE', '%' . $keyword . '%')
@@ -225,6 +230,55 @@ class UserController extends Controller
         return to_route('users.index')->with([
             'alert-type' => 'alert-danger',
             'alert-message' => 'User deleted successfully',
+        ]);
+    }
+
+    public function impersonate(User $user)
+    {
+        $currentUser = auth()->user();
+
+        if ($currentUser->role !== 'superadmin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if ($user->id === $currentUser->id || $user->role === 'superadmin') {
+            return back()->with([
+                'alert-type' => 'alert-danger',
+                'alert-message' => 'Cannot simulate yourself or another superadmin',
+            ]);
+        }
+
+        // Store the original superadmin ID
+        session(['original_superadmin_id' => $currentUser->id]);
+
+        // Login as the target user
+        auth()->login($user);
+
+        return to_route('home')->with([
+            'alert-type' => 'alert-success',
+            'alert-message' => "Logged in as {$user->name} ({$user->role})",
+        ]);
+    }
+
+    public function stopImpersonation()
+    {
+        $originalSuperadminId = session('original_superadmin_id');
+
+        if (!$originalSuperadminId) {
+            abort(403, 'No simulation session active.');
+        }
+
+        $superadmin = User::findOrFail($originalSuperadminId);
+
+        // Login back as superadmin
+        auth()->login($superadmin);
+
+        // Forget the original session ID
+        session()->forget('original_superadmin_id');
+
+        return to_route('users.index')->with([
+            'alert-type' => 'alert-success',
+            'alert-message' => 'Simulation ended. Returned to Superadmin context.',
         ]);
     }
 }

@@ -1,0 +1,618 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+:root {
+    /* Brand specific colors (overridden dynamically in head) */
+    --color-primary: #6366f1;
+    --color-primary-glow: rgba(99, 102, 241, 0.12);
+    --color-accent: #10b981;
+    --color-accent-glow: rgba(16, 185, 129, 0.12);
+
+    /* Material 3 Dark Palette Defaults */
+    --bg-app: #0e121a;
+    --surface-app: #171c26;
+    --surface-glass: rgba(23, 28, 38, 0.8);
+    --border-app: rgba(255, 255, 255, 0.08);
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --card-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+    
+    --input-bg: var(--bg-app);
+    --input-border: var(--border-app);
+    --sidebar-bg: var(--bg-app);
+    --sidebar-active-bg: var(--color-primary-glow);
+    --btn-radius: 9999px;
+}
+
+.theme-light {
+    /* Material 3 Light Palette Defaults */
+    --bg-app: #f8fafc;
+    --surface-app: #ffffff;
+    --surface-glass: rgba(255, 255, 255, 0.85);
+    --border-app: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    --card-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+    
+    --input-bg: var(--surface-app);
+    --input-border: var(--border-app);
+    --sidebar-bg: var(--surface-app);
+    --sidebar-active-bg: var(--color-primary-glow);
+}
+
+body {
+    background-color: var(--bg-app) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Inter', sans-serif !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    min-height: 100vh;
+}
+
+/* General Text Inheritance for dark/light consistency */
+h1, h2, h3, h4, h5, h6, p, span, li, label, th, td {
+    color: var(--text-primary);
+}
+
+h1, h2, h3, h4, h5, h6, .navbar-brand, .sidebar-heading {
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 600;
+}
+
+/* Navbar Link colors and hover states */
+.navbar .nav-link, 
+.navbar .navbar-brand, 
+#navbarDropdown,
+.navbar .dropdown-toggle {
+    color: var(--text-primary) !important;
+}
+
+.navbar .nav-link:hover, 
+#navbarDropdown:hover {
+    color: var(--color-primary) !important;
+}
+
+/* Dropdown Menu overrides */
+.dropdown-menu {
+    background-color: var(--surface-app) !important;
+    border: 1px solid var(--border-app) !important;
+    border-radius: 12px !important;
+    box-shadow: var(--card-shadow) !important;
+}
+
+.dropdown-item {
+    color: var(--text-primary) !important;
+    font-weight: 500;
+    padding: 0.6rem 1.2rem !important;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: var(--border-app) !important;
+    color: var(--color-primary) !important;
+}
+
+/* Dark mode bootstrap utility overrides */
+body:not(.theme-light) .text-dark,
+body:not(.theme-light) .text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+body:not(.theme-light) .text-black {
+    color: var(--text-primary) !important;
+}
+
+body:not(.theme-light) .text-muted {
+    color: var(--text-muted) !important;
+}
+
+body:not(.theme-light) .bg-light {
+    background-color: var(--surface-app) !important;
+    color: var(--text-primary) !important;
+}
+
+body:not(.theme-light) .border {
+    border-color: var(--border-app) !important;
+}
+
+/* Premium alerts styling */
+.alert {
+    border-radius: 12px !important;
+    border: 1px solid var(--border-app) !important;
+}
+
+body:not(.theme-light) .alert-success {
+    background-color: rgba(16, 185, 129, 0.15) !important;
+    color: #34d399 !important;
+    border-color: rgba(16, 185, 129, 0.25) !important;
+}
+
+body:not(.theme-light) .alert-danger {
+    background-color: rgba(244, 63, 94, 0.15) !important;
+    color: #fb7185 !important;
+    border-color: rgba(244, 63, 94, 0.25) !important;
+}
+
+body:not(.theme-light) .alert-info {
+    background-color: rgba(59, 130, 246, 0.15) !important;
+    color: #60a5fa !important;
+    border-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+body:not(.theme-light) .alert-warning {
+    background-color: rgba(249, 115, 22, 0.15) !important;
+    color: #fb923c !important;
+    border-color: rgba(249, 115, 22, 0.25) !important;
+}
+
+/* Material 3 Navigation Drawer (Sidebar) */
+#sidebar-wrapper {
+    background-color: var(--sidebar-bg) !important;
+    border-right: 1px solid var(--border-app) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-heading {
+    background: transparent !important;
+    color: var(--color-primary) !important;
+    border-bottom: 1px solid var(--border-app) !important;
+    padding: 1.5rem 1.5rem !important;
+    font-size: 1.3rem;
+    letter-spacing: 0.08em;
+    font-weight: 800 !important;
+    text-transform: uppercase;
+}
+
+#sidebar-wrapper .list-group-item {
+    background-color: transparent !important;
+    color: var(--text-secondary) !important;
+    border: none !important;
+    padding: 0.75rem 1.5rem !important;
+    margin: 4px 12px !important;
+    width: calc(100% - 24px) !important;
+    border-radius: 9999px !important; /* M3 Pill Shape Navigation Item */
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#sidebar-wrapper .list-group-item i {
+    font-size: 1.15rem;
+    transition: transform 0.2s ease;
+}
+
+#sidebar-wrapper .list-group-item:hover {
+    color: var(--text-primary) !important;
+    background-color: rgba(255, 255, 255, 0.04) !important;
+}
+
+.theme-light #sidebar-wrapper .list-group-item:hover {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+}
+
+#sidebar-wrapper .list-group-item.active {
+    color: var(--color-primary) !important;
+    background-color: var(--sidebar-active-bg) !important;
+    font-weight: 600;
+}
+
+/* Material 3 App Bar (Navbar) */
+.navbar {
+    background-color: var(--surface-glass) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border-app) !important;
+    padding: 0.75rem 1.5rem !important;
+}
+
+.navbar .navbar-brand {
+    color: var(--text-primary) !important;
+    font-weight: 700;
+}
+
+.navbar .nav-link {
+    color: var(--text-secondary) !important;
+}
+
+/* Material 3 Cards (Rounded, clean surfaces) */
+.card {
+    background-color: var(--surface-app) !important;
+    border: 1px solid var(--border-app) !important;
+    border-radius: 16px !important; /* M3 Medium Card */
+    box-shadow: var(--card-shadow) !important;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    background-color: transparent !important;
+    border-bottom: 1px solid var(--border-app) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 1.25rem 1.5rem !important;
+}
+
+.card-body {
+    color: var(--text-secondary) !important;
+    padding: 1.5rem !important;
+}
+
+/* Tables (Clean Outlined M3 List Style) */
+.table {
+    color: var(--text-primary) !important;
+    margin-bottom: 0 !important;
+    background-color: var(--surface-app) !important;
+}
+
+.table th {
+    border-bottom-width: 1px !important;
+    border-color: var(--border-app) !important;
+    color: var(--text-muted) !important;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+    background-color: var(--surface-app) !important;
+}
+
+.table td, .table th {
+    padding: 1.1rem 1rem !important;
+    border-color: var(--border-app) !important;
+    vertical-align: middle;
+    background-color: var(--surface-app) !important;
+    color: var(--text-primary) !important;
+}
+
+.table-hover tbody tr:hover td {
+    background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+.theme-light .table-hover tbody tr:hover td {
+    background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Pagination styling */
+.pagination {
+    margin-top: 1rem;
+    gap: 4px;
+}
+
+.page-link {
+    background-color: var(--surface-app) !important;
+    border-color: var(--border-app) !important;
+    color: var(--text-secondary) !important;
+    border-radius: 8px !important;
+    padding: 0.5rem 1rem !important;
+    transition: all 0.2s ease;
+}
+
+.page-link:hover {
+    background-color: var(--border-app) !important;
+    color: var(--color-primary) !important;
+}
+
+.page-item.active .page-link {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: #ffffff !important;
+}
+
+.page-item.disabled .page-link {
+    background-color: var(--surface-app) !important;
+    border-color: var(--border-app) !important;
+    color: var(--text-muted) !important;
+    opacity: 0.5;
+}
+
+/* Outlined M3 Form Controls */
+.form-control, .form-select {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+    color: var(--text-primary) !important;
+    border-radius: 12px !important; /* M3 Rounded Inputs */
+    padding: 0.75rem 1.1rem !important;
+    font-size: 0.95rem;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--color-primary) !important;
+    box-shadow: 0 0 0 3px var(--color-primary-glow) !important;
+    outline: none !important;
+}
+
+.form-label {
+    color: var(--text-primary) !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.6rem;
+}
+
+.form-text {
+    color: var(--text-muted) !important;
+    font-size: 0.825rem;
+    margin-top: 0.4rem;
+}
+
+/* Pill Buttons (M3 Common Button) */
+.btn {
+    border-radius: var(--btn-radius) !important; /* Pill style */
+    padding: 0.6rem 1.5rem !important;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-sm {
+    padding: 0.4rem 1.1rem !important;
+    font-size: 0.825rem;
+}
+
+.btn-primary {
+    background-color: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+    color: #ffffff !important;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    opacity: 0.95;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--color-primary-glow) !important;
+}
+
+.btn-outline-secondary {
+    border-color: var(--border-app) !important;
+    color: var(--text-secondary) !important;
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--border-app) !important;
+    color: var(--text-primary) !important;
+}
+
+.btn-dark {
+    background-color: #0f172a !important;
+    border-color: #0f172a !important;
+    color: #ffffff !important;
+}
+
+.btn-dark:hover {
+    background-color: #1e293b !important;
+    transform: translateY(-1px);
+}
+
+/* Organisation Banner (1200x300 M3 rounded card) */
+.org-banner-container {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-app);
+    box-shadow: var(--card-shadow);
+}
+
+.org-banner-img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+/* Glow backgrounds */
+.bg-glow-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.bg-glow-1 {
+    position: absolute;
+    top: -10%;
+    right: -10%;
+    width: 60vw;
+    height: 60vw;
+    filter: blur(120px);
+    animation: floatGlow 18s infinite alternate ease-in-out;
+}
+
+.bg-glow-2 {
+    position: absolute;
+    bottom: -10%;
+    left: -10%;
+    width: 50vw;
+    height: 50vw;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.04) 0%, rgba(16, 185, 129, 0) 70%);
+    filter: blur(120px);
+    animation: floatGlow 24s infinite alternate-reverse ease-in-out;
+}
+
+@keyframes floatGlow {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(4%, 4%) scale(1.05); }
+}
+
+/* Page wrappers overrides */
+#page-content-wrapper {
+    background-color: transparent !important;
+}
+
+main {
+    background-color: transparent !important;
+}
+
+.menu-toggle-btn {
+    color: var(--text-secondary) !important;
+}
+
+.menu-toggle-btn:hover {
+    color: var(--text-primary) !important;
+}
+
+/* Table container styling */
+.table-responsive {
+    border-radius: 12px;
+    border: 1px solid var(--border-app);
+    overflow: hidden;
+    background-color: var(--surface-app);
+    margin-bottom: 1rem;
+}
+
+.table-responsive .table {
+    border: none !important;
+}
+
+.table-responsive .table td:first-child,
+.table-responsive .table th:first-child {
+    padding-left: 1.5rem !important;
+}
+
+.table-responsive .table td:last-child,
+.table-responsive .table th:last-child {
+    padding-right: 1.5rem !important;
+}
+
+/* Harmonized Action Buttons (M3 Tonal Designs) */
+.btn-info {
+    background-color: var(--color-primary-glow) !important;
+    border: 1px solid transparent !important;
+    color: var(--color-primary) !important;
+}
+
+.btn-info:hover {
+    background-color: var(--color-primary) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px var(--color-primary-glow) !important;
+}
+
+.btn-danger {
+    background-color: rgba(244, 63, 94, 0.12) !important;
+    border: 1px solid transparent !important;
+    color: #f43f5e !important;
+}
+
+.btn-danger:hover {
+    background-color: #f43f5e !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25) !important;
+}
+
+.btn-warning {
+    background-color: rgba(249, 115, 22, 0.12) !important;
+    border: 1px solid transparent !important;
+    color: #f97316 !important;
+}
+
+.btn-warning:hover {
+    background-color: #f97316 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25) !important;
+}
+
+/* Floating Alert Toast (Bottom Right) */
+.floating-toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    max-width: 350px;
+    width: calc(100vw - 48px);
+    pointer-events: none;
+}
+
+.floating-toast {
+    pointer-events: auto;
+    background-color: var(--surface-glass) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-app) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25) !important;
+    padding: 1rem 1.25rem !important;
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    animation: slideInToast 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+@keyframes slideInToast {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.floating-toast.fade-out {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+}
+
+.floating-toast-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.floating-toast-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s ease;
+}
+
+.floating-toast-close:hover {
+    color: var(--text-primary);
+}
+
+/* Accent borders for different toast statuses */
+.toast-success {
+    border-left: 4px solid #10b981 !important;
+}
+.toast-success i {
+    color: #10b981;
+}
+
+.toast-danger {
+    border-left: 4px solid #f43f5e !important;
+}
+.toast-danger i {
+    color: #f43f5e;
+}
+
+.toast-warning {
+    border-left: 4px solid #f97316 !important;
+}
+.toast-warning i {
+    color: #f97316;
+}
+
+.toast-info {
+    border-left: 4px solid #3b82f6 !important;
+}
+.toast-info i {
+    color: #3b82f6;
+}
