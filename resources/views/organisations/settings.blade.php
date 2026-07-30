@@ -15,12 +15,6 @@
                     <a href="{{ route('home') }}" class="btn btn-sm btn-outline-secondary">Back to Dashboard</a>
                 </div>
 
-                @if (session()->has('alert-message'))
-                    <div class="alert {{ session()->get('alert-type') }} m-3">
-                        {{ session()->get('alert-message') }}
-                    </div>
-                @endif
-
                 <div class="card-body">
                     <form action="{{ route('organisation.update-settings') }}" method="POST" enctype="multipart/form-data">
                         @csrf

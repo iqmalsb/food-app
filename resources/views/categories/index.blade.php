@@ -7,12 +7,7 @@
             <div class="card">
                 <div class="card-header">Category Index</div>
 
-                @if (session()->has('alert-message'))
-                    <div class="alert {{ session()->get('alert-type') }}">
-                        {{ session()->get('alert-message') }}
-                    </div>
-                @endif
-                
+
                 <div class="card-body">
                     <form action="" method="">
                         <div class="input-group">

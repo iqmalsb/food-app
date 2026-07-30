@@ -377,6 +377,57 @@
         });
     </script>
     @endauth
+
+    <!-- Floating dynamic toast alerts -->
+    @if (session()->has('alert-message'))
+        <div class="floating-toast-container">
+            @php
+                $alertType = session()->get('alert-type', 'alert-success');
+                $toastClass = 'toast-success';
+                $toastIcon = 'bi-check-circle-fill';
+                
+                if (str_contains($alertType, 'danger')) {
+                    $toastClass = 'toast-danger';
+                    $toastIcon = 'bi-exclamation-octagon-fill';
+                } elseif (str_contains($alertType, 'warning')) {
+                    $toastClass = 'toast-warning';
+                    $toastIcon = 'bi-exclamation-triangle-fill';
+                } elseif (str_contains($alertType, 'info')) {
+                    $toastClass = 'toast-info';
+                    $toastIcon = 'bi-info-circle-fill';
+                }
+            @endphp
+            
+            <div id="global-app-toast" class="floating-toast {{ $toastClass }}">
+                <div class="floating-toast-content">
+                    <i class="bi {{ $toastIcon }}" style="font-size: 1.25rem;"></i>
+                    <span>{{ session()->get('alert-message') }}</span>
+                </div>
+                <button class="floating-toast-close" onclick="closeToast()">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+        </div>
+
+        <script>
+            function closeToast() {
+                const toast = document.getElementById('global-app-toast');
+                if (toast) {
+                    toast.classList.add('fade-out');
+                    setTimeout(() => {
+                        if (toast.parentElement) {
+                            toast.parentElement.remove();
+                        }
+                    }, 500);
+                }
+            }
+            
+            // Auto close after 10 seconds (10000ms)
+            setTimeout(() => {
+                closeToast();
+            }, 10000);
+        </script>
+    @endif
 </body>
 
 </html>
