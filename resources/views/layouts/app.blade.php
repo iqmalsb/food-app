@@ -20,12 +20,62 @@
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/sidebar.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/theme.css') }}" rel="stylesheet">
 
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    @php
+        $activeOrg = null;
+        if (Auth::check()) {
+            $activeOrgId = Auth::user()->organisation_id ?? session('current_organisation_id');
+            if ($activeOrgId) {
+                $activeOrg = \App\Models\Organisation::find($activeOrgId);
+            }
+        }
+        
+        $themeMode = $activeOrg ? $activeOrg->theme_mode : 'dark';
+        $themeColor = $activeOrg ? $activeOrg->theme_color : 'indigo';
+        
+        $colorHex = '#6366f1';
+        $colorRgb = '99, 102, 241';
+        
+        switch ($themeColor) {
+            case 'emerald':
+                $colorHex = '#10b981';
+                $colorRgb = '16, 185, 129';
+                break;
+            case 'blue':
+                $colorHex = '#3b82f6';
+                $colorRgb = '59, 130, 246';
+                break;
+            case 'rose':
+                $colorHex = '#f43f5e';
+                $colorRgb = '244, 63, 94';
+                break;
+            case 'orange':
+                $colorHex = '#f97316';
+                $colorRgb = '249, 115, 22';
+                break;
+        }
+    @endphp
+    
+    <style>
+        :root {
+            --color-primary: {{ $colorHex }} !important;
+            --color-primary-glow: rgba({{ $colorRgb }}, 0.15) !important;
+        }
+    </style>
 </head>
 
-<body>
+<body class="theme-{{ $themeMode }}">
+    @if($themeMode === 'dark')
+        <!-- Background Glowing Mesh -->
+        <div class="bg-glow-container" aria-hidden="true">
+            <div class="bg-glow-1" style="background: radial-gradient(circle, rgba({{ $colorRgb }}, 0.08) 0%, rgba({{ $colorRgb }}, 0) 70%);"></div>
+            <div class="bg-glow-2"></div>
+        </div>
+    @endif
     <div id="app">
         @auth
             <div id="wrapper">
@@ -49,6 +99,9 @@
                             <a href="{{ route('users.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('users.*') ? 'active' : '' }}">
                                 <i class="bi bi-people"></i> Users
                             </a>
+                            <a href="{{ route('organisation.settings') }}" class="list-group-item list-group-item-action {{ request()->routeIs('organisation.settings') ? 'active' : '' }}">
+                                <i class="bi bi-gear"></i> Settings
+                            </a>
                         @endif
                         @if (Auth::user()->role === 'superadmin')
                             <a href="{{ route('organisations.index') }}" class="list-group-item list-group-item-action {{ request()->routeIs('organisations.*') ? 'active' : '' }}">
@@ -69,8 +122,11 @@
                             <span class="navbar-brand d-none d-md-inline-block">{{ config('app.name', 'DineFlow') }}</span>
 
                             <div class="ms-auto d-flex align-items-center">
-                                <span class="me-3 text-secondary d-none d-sm-inline" style="font-size: 0.9rem;">
+                                <span class="me-3 text-secondary d-none d-sm-inline d-flex align-items-center gap-2" style="font-size: 0.9rem;">
                                     @if(Auth::user()->organisation)
+                                        @if(Auth::user()->organisation->banner_image)
+                                            <img src="{{ asset('/storage/' . Auth::user()->organisation->banner_image) }}" alt="Banner" class="rounded" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid var(--border-app);">
+                                        @endif
                                         <i class="bi bi-building"></i> {{ Auth::user()->organisation->name }}
                                     @else
                                         <i class="bi bi-shield-lock"></i> Global Admin

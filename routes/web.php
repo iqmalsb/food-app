@@ -53,6 +53,10 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::get('/users/{user}', [App\Http\Controllers\UserController::class, 'show'])->name('users.show');
     Route::post('/users/{user}/update', [App\Http\Controllers\UserController::class, 'update'])->name('users.update');
     Route::get('/users/{user}/delete', [App\Http\Controllers\UserController::class, 'delete'])->name('users.delete');
+    
+    // Organisation Settings
+    Route::get('/organisation/settings', [App\Http\Controllers\OrganisationController::class, 'settings'])->name('organisation.settings');
+    Route::post('/organisation/settings/update', [App\Http\Controllers\OrganisationController::class, 'updateSettings'])->name('organisation.update-settings');
 });
 
 // Organisation CRUD Management Routes (Gated by Superadmin)

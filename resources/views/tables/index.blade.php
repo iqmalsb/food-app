@@ -24,32 +24,34 @@
                 </div>
 
                 <div class="card-body">
-                    <table class="table">
-                        <thead>
-                          <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Table No</th>
-                            <th scope="col">Max Pax</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($tables as $table)
-                                <tr>
-                                    <th scope="row">{{$loop->iteration}}</th>
-                                    <td>{{$table->table_no}}</td>
-                                    <td>{{$table->max_pax}}</td>
-                                    <td>{{$table->status}}</td>
-                                    <td>
-                                        <a href="{{ route('tables.show', $table) }}" type="button" class="btn btn-info">Details</a>
-                                        <a href="{{ route('tables.delete', $table) }}" type="button" class="btn btn-danger">Delete</a>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                      </table>
-                      {{-- {{ $foods->links() }} --}}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                              <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Table No</th>
+                                <th scope="col">Max Pax</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($tables as $table)
+                                    <tr>
+                                        <th scope="row">{{$loop->iteration}}</th>
+                                        <td>{{$table->table_no}}</td>
+                                        <td>{{$table->max_pax}}</td>
+                                        <td>{{$table->status}}</td>
+                                        <td>
+                                            <a href="{{ route('tables.show', $table) }}" type="button" class="btn btn-info">Details</a>
+                                            <a href="{{ route('tables.delete', $table) }}" type="button" class="btn btn-danger">Delete</a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    {{-- {{ $foods->links() }} --}}
                 </div>
             </div>
         </div>

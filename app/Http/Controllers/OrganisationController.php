@@ -11,6 +11,11 @@ class OrganisationController extends Controller
     public function __construct()
     {
         $this->middleware(['auth', 'verified', function ($request, $next) {
+            if ($request->route() && in_array($request->route()->getName(), ['organisation.settings', 'organisation.update-settings'])) {
+                if (in_array(auth()->user()->role, ['superadmin', 'org_admin', 'admin'])) {
+                    return $next($request);
+                }
+            }
             if (auth()->user()->role === 'superadmin') {
                 return $next($request);
             }
@@ -82,6 +87,54 @@ class OrganisationController extends Controller
         return to_route('organisations.index')->with([
             'alert-type' => 'alert-danger',
             'alert-message' => 'Organisation deleted successfully',
+        ]);
+    }
+
+    public function settings()
+    {
+        $orgId = auth()->user()->organisation_id ?? session('current_organisation_id');
+        if (!$orgId) {
+            $organisation = Organisation::first();
+            if (!$organisation) {
+                abort(404, 'No organisation found.');
+            }
+        } else {
+            $organisation = Organisation::findOrFail($orgId);
+        }
+
+        return view('organisations.settings', compact('organisation'));
+    }
+
+    public function updateSettings(Request $request)
+    {
+        $orgId = auth()->user()->organisation_id ?? session('current_organisation_id');
+        if (!$orgId) {
+            $organisation = Organisation::first();
+            if (!$organisation) {
+                abort(404, 'No organisation found.');
+            }
+        } else {
+            $organisation = Organisation::findOrFail($orgId);
+        }
+
+        $validated = $request->validate([
+            'theme_color' => ['required', 'string', 'in:indigo,emerald,blue,rose,orange'],
+            'theme_mode' => ['required', 'string', 'in:light,dark'],
+            'banner_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+        ]);
+
+        if ($request->hasFile('banner_image')) {
+            $path = $request->file('banner_image')->store('banners', 'public');
+            $organisation->banner_image = $path;
+        }
+
+        $organisation->theme_color = $validated['theme_color'];
+        $organisation->theme_mode = $validated['theme_mode'];
+        $organisation->save();
+
+        return back()->with([
+            'alert-type' => 'alert-success',
+            'alert-message' => 'Organisation settings updated successfully',
         ]);
     }
 }

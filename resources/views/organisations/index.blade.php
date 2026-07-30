@@ -30,50 +30,52 @@
                 </div>
 
                 <div class="card-body">
-                    <table class="table table-hover">
-                        <thead>
-                          <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Slug</th>
-                            <th scope="col">Seats Limit</th>
-                            <th scope="col">Active Users</th>
-                            <th scope="col">Created At</th>
-                            <th scope="col">Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($organisations as $org)
-                                <tr>
-                                    <th scope="row">{{ $loop->iteration + ($organisations->firstItem() - 1) }}</th>
-                                    <td><strong>{{ $org->name }}</strong></td>
-                                    <td><code>{{ $org->slug }}</code></td>
-                                    <td>{{ $org->seats_limit }}</td>
-                                    <td>
-                                        @php
-                                            $activeUsersCount = \App\Models\User::withoutGlobalScopes()->where('organisation_id', $org->id)->count();
-                                        @endphp
-                                        <span class="badge {{ $activeUsersCount >= $org->seats_limit ? 'bg-danger' : 'bg-success' }}">
-                                            {{ $activeUsersCount }} / {{ $org->seats_limit }}
-                                        </span>
-                                    </td>
-                                    <td>{{ $org->created_at->format('Y-m-d H:i') }}</td>
-                                    <td>
-                                        <a href="{{ route('organisations.show', $org) }}" class="btn btn-sm btn-info">Details</a>
-                                        <a href="{{ route('organisations.delete', $org) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this organisation? All associated users, foods, tables and orders will be deleted permanently.')">Delete</a>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="text-center">No organisations found.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                      </table>
-                      
-                      <div class="d-flex justify-content-center">
-                          {{ $organisations->appends(request()->query())->links() }}
-                      </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                              <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Slug</th>
+                                <th scope="col">Seats Limit</th>
+                                <th scope="col">Active Users</th>
+                                <th scope="col">Created At</th>
+                                <th scope="col">Actions</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($organisations as $org)
+                                    <tr>
+                                        <th scope="row">{{ $loop->iteration + ($organisations->firstItem() - 1) }}</th>
+                                        <td><strong>{{ $org->name }}</strong></td>
+                                        <td><code>{{ $org->slug }}</code></td>
+                                        <td>{{ $org->seats_limit }}</td>
+                                        <td>
+                                            @php
+                                                $activeUsersCount = \App\Models\User::withoutGlobalScopes()->where('organisation_id', $org->id)->count();
+                                            @endphp
+                                            <span class="badge {{ $activeUsersCount >= $org->seats_limit ? 'bg-danger' : 'bg-success' }}">
+                                                {{ $activeUsersCount }} / {{ $org->seats_limit }}
+                                            </span>
+                                        </td>
+                                        <td>{{ $org->created_at->format('Y-m-d H:i') }}</td>
+                                        <td>
+                                            <a href="{{ route('organisations.show', $org) }}" class="btn btn-sm btn-info">Details</a>
+                                            <a href="{{ route('organisations.delete', $org) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this organisation? All associated users, foods, tables and orders will be deleted permanently.')">Delete</a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center">No organisations found.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center">
+                        {{ $organisations->appends(request()->query())->links() }}
+                    </div>
                 </div>
             </div>
         </div>
