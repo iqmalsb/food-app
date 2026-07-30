@@ -19,50 +19,63 @@ Route::get('/', function () {
 
 Auth::routes(['verify' => true]);
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
-// Food Routes
-Route::get('/food', [App\Http\Controllers\FoodController::class, 'index'])->name('food.index');
-Route::get('/food/create', [App\Http\Controllers\FoodController::class, 'create'])->name('food.create');
-Route::post('/food/store', [App\Http\Controllers\FoodController::class, 'store'])->name('food.store');
-Route::get('/food/{food}', [App\Http\Controllers\FoodController::class, 'show'])->name('food.show');
-Route::post('/food/{food}/update', [App\Http\Controllers\FoodController::class, 'update'])->name('food.update');
-Route::get('/food/{food}/delete', [App\Http\Controllers\FoodController::class, 'delete'])->name('food.delete');
-
-// Category Routes
-Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
-Route::get('/categories/create', [App\Http\Controllers\CategoryController::class, 'create'])->name('categories.create');
-Route::post('/categories/store', [App\Http\Controllers\CategoryController::class, 'store'])->name('categories.store');
-Route::get('/categories/{category}', [App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
-Route::post('/categories/{category}/update', [App\Http\Controllers\CategoryController::class, 'update'])->name('categories.update');
-Route::get('/categories/{category}/delete', [App\Http\Controllers\CategoryController::class, 'delete'])->name('categories.delete');
-
-// Table Routes
-Route::get('/tables', [App\Http\Controllers\TableController::class, 'index'])->name('tables.index');
-Route::get('/tables/create', [App\Http\Controllers\TableController::class, 'create'])->name('tables.create');
-Route::post('/tables/store', [App\Http\Controllers\TableController::class, 'store'])->name('tables.store');
-Route::get('/tables/{table}', [App\Http\Controllers\TableController::class, 'show'])->name('tables.show');
-Route::post('/tables/{table}/update', [App\Http\Controllers\TableController::class, 'update'])->name('tables.update');
-Route::get('/tables/{table}/delete', [App\Http\Controllers\TableController::class, 'delete'])->name('tables.delete');
-
-// User CRUD Management Routes (Gated by Admin)
-Route::middleware(['auth', 'verified', 'admin'])->group(function () {
-    Route::get('/users', [App\Http\Controllers\UserController::class, 'index'])->name('users.index');
-    Route::post('/users/{user}/impersonate', [App\Http\Controllers\UserController::class, 'impersonate'])->name('users.impersonate');
-    Route::get('/users/create', [App\Http\Controllers\UserController::class, 'create'])->name('users.create');
-    Route::post('/users/store', [App\Http\Controllers\UserController::class, 'store'])->name('users.store');
-    Route::get('/users/{user}', [App\Http\Controllers\UserController::class, 'show'])->name('users.show');
-    Route::post('/users/{user}/update', [App\Http\Controllers\UserController::class, 'update'])->name('users.update');
-    Route::get('/users/{user}/delete', [App\Http\Controllers\UserController::class, 'delete'])->name('users.delete');
+// Routes gated by Auth (accessible even when user must change password)
+Route::middleware(['auth'])->group(function () {
+    Route::post('/users/stop-impersonation', [App\Http\Controllers\UserController::class, 'stopImpersonation'])->name('users.stop-impersonation');
     
-    // Organisation Settings
-    Route::get('/organisation/settings', [App\Http\Controllers\OrganisationController::class, 'settings'])->name('organisation.settings');
-    Route::post('/organisation/settings/update', [App\Http\Controllers\OrganisationController::class, 'updateSettings'])->name('organisation.update-settings');
+    // Password Change routes
+    Route::get('/password/change', [App\Http\Controllers\UserController::class, 'changePasswordForm'])->name('password.change-form');
+    Route::post('/password/change', [App\Http\Controllers\UserController::class, 'changePassword'])->name('password.change');
 });
 
-// Organisation CRUD Management Routes (Gated by Superadmin)
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::post('/users/stop-impersonation', [App\Http\Controllers\UserController::class, 'stopImpersonation'])->name('users.stop-impersonation');
+// App Routes (protected by force_password_change check)
+Route::middleware(['auth', 'force_password_change'])->group(function () {
+    
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+    // Food Routes
+    Route::get('/food', [App\Http\Controllers\FoodController::class, 'index'])->name('food.index');
+    Route::get('/food/create', [App\Http\Controllers\FoodController::class, 'create'])->name('food.create');
+    Route::post('/food/store', [App\Http\Controllers\FoodController::class, 'store'])->name('food.store');
+    Route::get('/food/{food}', [App\Http\Controllers\FoodController::class, 'show'])->name('food.show');
+    Route::post('/food/{food}/update', [App\Http\Controllers\FoodController::class, 'update'])->name('food.update');
+    Route::get('/food/{food}/delete', [App\Http\Controllers\FoodController::class, 'delete'])->name('food.delete');
+
+    // Category Routes
+    Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index'])->name('categories.index');
+    Route::get('/categories/create', [App\Http\Controllers\CategoryController::class, 'create'])->name('categories.create');
+    Route::post('/categories/store', [App\Http\Controllers\CategoryController::class, 'store'])->name('categories.store');
+    Route::get('/categories/{category}', [App\Http\Controllers\CategoryController::class, 'show'])->name('categories.show');
+    Route::post('/categories/{category}/update', [App\Http\Controllers\CategoryController::class, 'update'])->name('categories.update');
+    Route::get('/categories/{category}/delete', [App\Http\Controllers\CategoryController::class, 'delete'])->name('categories.delete');
+
+    // Table Routes
+    Route::get('/tables', [App\Http\Controllers\TableController::class, 'index'])->name('tables.index');
+    Route::get('/tables/create', [App\Http\Controllers\TableController::class, 'create'])->name('tables.create');
+    Route::post('/tables/store', [App\Http\Controllers\TableController::class, 'store'])->name('tables.store');
+    Route::get('/tables/{table}', [App\Http\Controllers\TableController::class, 'show'])->name('tables.show');
+    Route::post('/tables/{table}/update', [App\Http\Controllers\TableController::class, 'update'])->name('tables.update');
+    Route::get('/tables/{table}/delete', [App\Http\Controllers\TableController::class, 'delete'])->name('tables.delete');
+
+    // User CRUD Management Routes (Gated by Admin)
+    Route::middleware(['admin'])->group(function () {
+        Route::get('/users', [App\Http\Controllers\UserController::class, 'index'])->name('users.index');
+        Route::post('/users/{user}/impersonate', [App\Http\Controllers\UserController::class, 'impersonate'])->name('users.impersonate');
+        Route::get('/users/create', [App\Http\Controllers\UserController::class, 'create'])->name('users.create')->middleware('check_seats_limit');
+        Route::post('/users/store', [App\Http\Controllers\UserController::class, 'store'])->name('users.store')->middleware('check_seats_limit');
+        Route::get('/users/{user}', [App\Http\Controllers\UserController::class, 'show'])->name('users.show');
+        Route::post('/users/{user}/update', [App\Http\Controllers\UserController::class, 'update'])->name('users.update');
+        Route::get('/users/{user}/delete', [App\Http\Controllers\UserController::class, 'delete'])->name('users.delete');
+        
+        // Organisation Settings
+        Route::get('/organisation/settings', [App\Http\Controllers\OrganisationController::class, 'settings'])->name('organisation.settings');
+        Route::post('/organisation/settings/update', [App\Http\Controllers\OrganisationController::class, 'updateSettings'])->name('organisation.update-settings');
+    });
+
+    // Support Inquiry Route
+    Route::post('/support/inquiry', [App\Http\Controllers\UserController::class, 'submitSupportInquiry'])->name('support.inquiry');
+
+    // Organisation CRUD Management Routes (Gated by Superadmin)
     Route::get('/organisations', [App\Http\Controllers\OrganisationController::class, 'index'])->name('organisations.index');
     Route::post('/organisations/switch', [App\Http\Controllers\OrganisationController::class, 'switch'])->name('organisations.switch');
     Route::get('/organisations/create', [App\Http\Controllers\OrganisationController::class, 'create'])->name('organisations.create');
@@ -71,5 +84,3 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/organisations/{organisation}/update', [App\Http\Controllers\OrganisationController::class, 'update'])->name('organisations.update');
     Route::get('/organisations/{organisation}/delete', [App\Http\Controllers\OrganisationController::class, 'delete'])->name('organisations.delete');
 });
-
-
