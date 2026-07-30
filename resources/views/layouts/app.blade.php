@@ -43,34 +43,148 @@
                 }
             }
         }
-        
-        $colorHex = '#6366f1';
-        $colorRgb = '99, 102, 241';
-        
-        switch ($themeColor) {
-            case 'emerald':
-                $colorHex = '#10b981';
-                $colorRgb = '16, 185, 129';
-                break;
-            case 'blue':
-                $colorHex = '#3b82f6';
-                $colorRgb = '59, 130, 246';
-                break;
-            case 'rose':
-                $colorHex = '#f43f5e';
-                $colorRgb = '244, 63, 94';
-                break;
-            case 'orange':
-                $colorHex = '#f97316';
-                $colorRgb = '249, 115, 22';
-                break;
-        }
+
+        // Tonal palettes mapping themeColor + themeMode to Material You dynamic tokens
+        $palettes = [
+            'indigo' => [
+                'light' => [
+                    'primary' => '#6366f1',
+                    'primary_glow' => 'rgba(99, 102, 241, 0.12)',
+                    'bg_app' => '#f6f7ff',
+                    'surface_app' => '#ffffff',
+                    'surface_glass' => 'rgba(255, 255, 255, 0.85)',
+                    'border_app' => '#e0e2f9',
+                    'text_primary' => '#1b1b2f',
+                    'text_secondary' => '#555670',
+                    'rgb' => '99, 102, 241',
+                ],
+                'dark' => [
+                    'primary' => '#818cf8',
+                    'primary_glow' => 'rgba(129, 140, 248, 0.15)',
+                    'bg_app' => '#0d0e15',
+                    'surface_app' => '#151622',
+                    'surface_glass' => 'rgba(21, 22, 34, 0.8)',
+                    'border_app' => '#28293d',
+                    'text_primary' => '#f1f3fe',
+                    'text_secondary' => '#a3a8cc',
+                    'rgb' => '129, 140, 248',
+                ]
+            ],
+            'emerald' => [
+                'light' => [
+                    'primary' => '#10b981',
+                    'primary_glow' => 'rgba(16, 185, 129, 0.12)',
+                    'bg_app' => '#f4faf7',
+                    'surface_app' => '#ffffff',
+                    'surface_glass' => 'rgba(255, 255, 255, 0.85)',
+                    'border_app' => '#def0e8',
+                    'text_primary' => '#0c1f17',
+                    'text_secondary' => '#40584d',
+                    'rgb' => '16, 185, 129',
+                ],
+                'dark' => [
+                    'primary' => '#34d399',
+                    'primary_glow' => 'rgba(52, 211, 153, 0.15)',
+                    'bg_app' => '#080c0a',
+                    'surface_app' => '#0f1713',
+                    'surface_glass' => 'rgba(15, 23, 19, 0.8)',
+                    'border_app' => '#1e2f27',
+                    'text_primary' => '#ecfdf5',
+                    'text_secondary' => '#9bf2d2',
+                    'rgb' => '52, 211, 153',
+                ]
+            ],
+            'blue' => [
+                'light' => [
+                    'primary' => '#3b82f6',
+                    'primary_glow' => 'rgba(59, 130, 246, 0.12)',
+                    'bg_app' => '#f4f8ff',
+                    'surface_app' => '#ffffff',
+                    'surface_glass' => 'rgba(255, 255, 255, 0.85)',
+                    'border_app' => '#dce7f9',
+                    'text_primary' => '#0e1827',
+                    'text_secondary' => '#42526e',
+                    'rgb' => '59, 130, 246',
+                ],
+                'dark' => [
+                    'primary' => '#60a5fa',
+                    'primary_glow' => 'rgba(96, 165, 250, 0.15)',
+                    'bg_app' => '#080b11',
+                    'surface_app' => '#0f1520',
+                    'surface_glass' => 'rgba(15, 21, 32, 0.8)',
+                    'border_app' => '#1d283d',
+                    'text_primary' => '#eff6ff',
+                    'text_secondary' => '#a3c1d9',
+                    'rgb' => '96, 165, 250',
+                ]
+            ],
+            'rose' => [
+                'light' => [
+                    'primary' => '#f43f5e',
+                    'primary_glow' => 'rgba(244, 63, 94, 0.12)',
+                    'bg_app' => '#fff5f6',
+                    'surface_app' => '#ffffff',
+                    'surface_glass' => 'rgba(255, 255, 255, 0.85)',
+                    'border_app' => '#fce4e7',
+                    'text_primary' => '#260b0f',
+                    'text_secondary' => '#6e4449',
+                    'rgb' => '244, 63, 94',
+                ],
+                'dark' => [
+                    'primary' => '#fb7185',
+                    'primary_glow' => 'rgba(251, 113, 133, 0.15)',
+                    'bg_app' => '#12080a',
+                    'surface_app' => '#1c0d10',
+                    'surface_glass' => 'rgba(28, 13, 16, 0.8)',
+                    'border_app' => '#381920',
+                    'text_primary' => '#fff1f2',
+                    'text_secondary' => '#e5b4bc',
+                    'rgb' => '251, 113, 133',
+                ]
+            ],
+            'orange' => [
+                'light' => [
+                    'primary' => '#f97316',
+                    'primary_glow' => 'rgba(249, 115, 22, 0.12)',
+                    'bg_app' => '#fff8f4',
+                    'surface_app' => '#ffffff',
+                    'surface_glass' => 'rgba(255, 255, 255, 0.85)',
+                    'border_app' => '#fce8dc',
+                    'text_primary' => '#271305',
+                    'text_secondary' => '#6c4d37',
+                    'rgb' => '249, 115, 22',
+                ],
+                'dark' => [
+                    'primary' => '#fb923c',
+                    'primary_glow' => 'rgba(251, 146, 60, 0.15)',
+                    'bg_app' => '#130a05',
+                    'surface_app' => '#1e1008',
+                    'surface_glass' => 'rgba(30, 16, 8, 0.8)',
+                    'border_app' => '#3d2110',
+                    'text_primary' => '#fffaf0',
+                    'text_secondary' => '#e5bda1',
+                    'rgb' => '251, 146, 60',
+                ]
+            ],
+        ];
+
+        // Fetch active theme settings
+        $selectedPalette = $palettes[$themeColor][$themeMode] ?? $palettes['indigo'][$themeMode];
+        $colorRgb = $selectedPalette['rgb'];
     @endphp
     
     <style>
         :root {
-            --color-primary: {{ $colorHex }} !important;
-            --color-primary-glow: rgba({{ $colorRgb }}, 0.15) !important;
+            --color-primary: {{ $selectedPalette['primary'] }} !important;
+            --color-primary-glow: {{ $selectedPalette['primary_glow'] }} !important;
+            
+            --bg-app: {{ $selectedPalette['bg_app'] }} !important;
+            --surface-app: {{ $selectedPalette['surface_app'] }} !important;
+            --surface-glass: {{ $selectedPalette['surface_glass'] }} !important;
+            --border-app: {{ $selectedPalette['border_app'] }} !important;
+            --text-primary: {{ $selectedPalette['text_primary'] }} !important;
+            --text-secondary: {{ $selectedPalette['text_secondary'] }} !important;
+            --sidebar-active-bg: {{ $selectedPalette['primary_glow'] }} !important;
         }
     </style>
 </head>

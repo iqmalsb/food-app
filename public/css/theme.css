@@ -17,10 +17,10 @@
     --text-muted: #64748b;
     --card-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
     
-    --input-bg: #0e121a;
-    --input-border: rgba(255, 255, 255, 0.12);
-    --sidebar-bg: #0b0e14;
-    --sidebar-active-bg: rgba(99, 102, 241, 0.14);
+    --input-bg: var(--bg-app);
+    --input-border: var(--border-app);
+    --sidebar-bg: var(--bg-app);
+    --sidebar-active-bg: var(--color-primary-glow);
     --btn-radius: 9999px;
 }
 
@@ -35,10 +35,10 @@
     --text-muted: #94a3b8;
     --card-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
     
-    --input-bg: #ffffff;
-    --input-border: #cbd5e1;
-    --sidebar-bg: #f1f5f9;
-    --sidebar-active-bg: rgba(99, 102, 241, 0.08);
+    --input-bg: var(--surface-app);
+    --input-border: var(--border-app);
+    --sidebar-bg: var(--surface-app);
+    --sidebar-active-bg: var(--color-primary-glow);
 }
 
 body {
