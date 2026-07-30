@@ -48,6 +48,7 @@ Route::get('/tables/{table}/delete', [App\Http\Controllers\TableController::clas
 // User CRUD Management Routes (Gated by Admin)
 Route::middleware(['auth', 'verified', 'admin'])->group(function () {
     Route::get('/users', [App\Http\Controllers\UserController::class, 'index'])->name('users.index');
+    Route::post('/users/{user}/impersonate', [App\Http\Controllers\UserController::class, 'impersonate'])->name('users.impersonate');
     Route::get('/users/create', [App\Http\Controllers\UserController::class, 'create'])->name('users.create');
     Route::post('/users/store', [App\Http\Controllers\UserController::class, 'store'])->name('users.store');
     Route::get('/users/{user}', [App\Http\Controllers\UserController::class, 'show'])->name('users.show');
@@ -61,7 +62,9 @@ Route::middleware(['auth', 'verified', 'admin'])->group(function () {
 
 // Organisation CRUD Management Routes (Gated by Superadmin)
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::post('/users/stop-impersonation', [App\Http\Controllers\UserController::class, 'stopImpersonation'])->name('users.stop-impersonation');
     Route::get('/organisations', [App\Http\Controllers\OrganisationController::class, 'index'])->name('organisations.index');
+    Route::post('/organisations/switch', [App\Http\Controllers\OrganisationController::class, 'switch'])->name('organisations.switch');
     Route::get('/organisations/create', [App\Http\Controllers\OrganisationController::class, 'create'])->name('organisations.create');
     Route::post('/organisations/store', [App\Http\Controllers\OrganisationController::class, 'store'])->name('organisations.store');
     Route::get('/organisations/{organisation}', [App\Http\Controllers\OrganisationController::class, 'show'])->name('organisations.show');
