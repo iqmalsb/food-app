@@ -481,3 +481,39 @@ main {
     padding-right: 1.5rem !important;
 }
 
+/* Harmonized Action Buttons (M3 Tonal Designs) */
+.btn-info {
+    background-color: var(--color-primary-glow) !important;
+    border: 1px solid transparent !important;
+    color: var(--color-primary) !important;
+}
+
+.btn-info:hover {
+    background-color: var(--color-primary) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px var(--color-primary-glow) !important;
+}
+
+.btn-danger {
+    background-color: rgba(244, 63, 94, 0.12) !important;
+    border: 1px solid transparent !important;
+    color: #f43f5e !important;
+}
+
+.btn-danger:hover {
+    background-color: #f43f5e !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(244, 63, 94, 0.25) !important;
+}
+
+.btn-warning {
+    background-color: rgba(249, 115, 22, 0.12) !important;
+    border: 1px solid transparent !important;
+    color: #f97316 !important;
+}
+
+.btn-warning:hover {
+    background-color: #f97316 !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.25) !important;
+}
