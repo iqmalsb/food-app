@@ -92,13 +92,11 @@ class OrganisationController extends Controller
 
     public function settings()
     {
-        $orgId = auth()->user()->organisation_id ?? session('current_organisation_id');
-        if (!$orgId) {
-            $organisation = Organisation::first();
-            if (!$organisation) {
-                abort(404, 'No organisation found.');
-            }
+        $user = auth()->user();
+        if ($user->role === 'superadmin') {
+            $organisation = null;
         } else {
+            $orgId = $user->organisation_id ?? session('current_organisation_id');
             $organisation = Organisation::findOrFail($orgId);
         }
 
@@ -107,34 +105,40 @@ class OrganisationController extends Controller
 
     public function updateSettings(Request $request)
     {
-        $orgId = auth()->user()->organisation_id ?? session('current_organisation_id');
-        if (!$orgId) {
-            $organisation = Organisation::first();
-            if (!$organisation) {
-                abort(404, 'No organisation found.');
-            }
-        } else {
-            $organisation = Organisation::findOrFail($orgId);
-        }
+        $user = auth()->user();
 
-        $validated = $request->validate([
+        $rules = [
             'theme_color' => ['required', 'string', 'in:indigo,emerald,blue,rose,orange'],
             'theme_mode' => ['required', 'string', 'in:light,dark'],
-            'banner_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
-        ]);
+        ];
 
-        if ($request->hasFile('banner_image')) {
-            $path = $request->file('banner_image')->store('banners', 'public');
-            $organisation->banner_image = $path;
+        if ($user->role !== 'superadmin') {
+            $rules['banner_image'] = ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'];
         }
 
-        $organisation->theme_color = $validated['theme_color'];
-        $organisation->theme_mode = $validated['theme_mode'];
-        $organisation->save();
+        $validated = $request->validate($rules);
+
+        if ($user->role === 'superadmin') {
+            $user->theme_color = $validated['theme_color'];
+            $user->theme_mode = $validated['theme_mode'];
+            $user->save();
+        } else {
+            $orgId = $user->organisation_id ?? session('current_organisation_id');
+            $organisation = Organisation::findOrFail($orgId);
+
+            if ($request->hasFile('banner_image')) {
+                $path = $request->file('banner_image')->store('banners', 'public');
+                $organisation->banner_image = $path;
+            }
+
+            $organisation->theme_color = $validated['theme_color'];
+            $organisation->theme_mode = $validated['theme_mode'];
+            $organisation->save();
+        }
 
         return back()->with([
             'alert-type' => 'alert-success',
-            'alert-message' => 'Organisation settings updated successfully',
+            'alert-message' => 'Settings updated successfully',
         ]);
     }
 }

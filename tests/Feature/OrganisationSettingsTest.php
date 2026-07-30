@@ -105,4 +105,37 @@ class OrganisationSettingsTest extends TestCase
         $this->assertNotNull($this->org->banner_image);
         Storage::disk('public')->assertExists($this->org->banner_image);
     }
+
+    public function test_superadmin_can_view_settings_without_banner_elements()
+    {
+        $superadmin = User::factory()->create([
+            'role' => 'superadmin',
+            'organisation_id' => null,
+        ]);
+
+        $response = $this->actingAs($superadmin)->get(route('organisation.settings'));
+        $response->assertStatus(200);
+        $response->assertSee('Settings');
+        $response->assertDontSee('Current Organisation Banner');
+        $response->assertDontSee('Upload New Banner');
+    }
+
+    public function test_superadmin_can_update_own_theme_settings()
+    {
+        $superadmin = User::factory()->create([
+            'role' => 'superadmin',
+            'organisation_id' => null,
+        ]);
+
+        $response = $this->actingAs($superadmin)->post(route('organisation.update-settings'), [
+            'theme_color' => 'rose',
+            'theme_mode' => 'light',
+        ]);
+
+        $response->assertRedirect();
+        
+        $superadmin->refresh();
+        $this->assertEquals('rose', $superadmin->theme_color);
+        $this->assertEquals('light', $superadmin->theme_mode);
+    }
 }

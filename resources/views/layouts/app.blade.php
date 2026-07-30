@@ -26,16 +26,23 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     @php
-        $activeOrg = null;
+        $themeMode = 'dark';
+        $themeColor = 'indigo';
+        
         if (Auth::check()) {
-            $activeOrgId = Auth::user()->organisation_id ?? session('current_organisation_id');
-            if ($activeOrgId) {
-                $activeOrg = \App\Models\Organisation::find($activeOrgId);
+            $user = Auth::user();
+            if ($user->role === 'superadmin') {
+                $themeMode = $user->theme_mode ?? 'dark';
+                $themeColor = $user->theme_color ?? 'indigo';
+            } else {
+                $activeOrgId = $user->organisation_id ?? session('current_organisation_id');
+                $activeOrg = $activeOrgId ? \App\Models\Organisation::find($activeOrgId) : null;
+                if ($activeOrg) {
+                    $themeMode = $activeOrg->theme_mode;
+                    $themeColor = $activeOrg->theme_color;
+                }
             }
         }
-        
-        $themeMode = $activeOrg ? $activeOrg->theme_mode : 'dark';
-        $themeColor = $activeOrg ? $activeOrg->theme_color : 'indigo';
         
         $colorHex = '#6366f1';
         $colorRgb = '99, 102, 241';
