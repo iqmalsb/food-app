@@ -153,6 +153,7 @@ body:not(.theme-light) .alert-warning {
 }
 
 .sidebar-heading {
+    background: transparent !important;
     color: var(--color-primary) !important;
     border-bottom: 1px solid var(--border-app) !important;
     padding: 1.5rem 1.5rem !important;
