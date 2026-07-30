@@ -8,45 +8,24 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SupportInquiryMail;
+
 class UserController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'verified', 'admin'])->except('stopImpersonation');
+        $this->middleware(['auth', 'admin'])->except([
+            'stopImpersonation',
+            'changePasswordForm',
+            'changePassword',
+            'submitSupportInquiry'
+        ]);
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $keyword = $request->keyword;
-        $currentUser = auth()->user();
-
-        // If superadmin, they can query across all organisations or a selected active tenant
-        if ($currentUser->role === 'superadmin') {
-            $orgId = \App\Traits\BelongsToOrganisation::getCurrentOrganisationId();
-            if ($orgId) {
-                $query = User::withoutGlobalScopes()->where('organisation_id', $orgId);
-            } else {
-                $query = User::withoutGlobalScopes();
-            }
-            if ($keyword) {
-                $query->where(function ($q) use ($keyword) {
-                    $q->where('name', 'LIKE', '%' . $keyword . '%')
-                      ->orWhere('email', 'LIKE', '%' . $keyword . '%');
-                });
-            }
-            $users = $query->paginate(10);
-        } else {
-            $query = User::where('organisation_id', $currentUser->organisation_id);
-            if ($keyword) {
-                $query->where(function ($q) use ($keyword) {
-                    $q->where('name', 'LIKE', '%' . $keyword . '%')
-                      ->orWhere('email', 'LIKE', '%' . $keyword . '%');
-                });
-            }
-            $users = $query->paginate(5);
-        }
-
-        return view('users.index', compact('users'));
+        return view('users.index');
     }
 
     public function create()
@@ -73,11 +52,16 @@ class UserController extends Controller
         $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
             'role' => ['required', 'string', Rule::in($roleOptions)],
             'contact_no' => ['nullable', 'string', 'max:255'],
             'position' => ['nullable', 'string', 'max:255'],
         ];
+
+        // Conditional password validation rules
+        $generatePassword = $request->boolean('generate_password');
+        if (!$generatePassword) {
+            $rules['password'] = ['required', 'string', 'min:8', 'confirmed'];
+        }
 
         // If superadmin, they must assign an organisation unless creating another superadmin
         if ($currentUser->role === 'superadmin') {
@@ -110,14 +94,30 @@ class UserController extends Controller
             }
         }
 
-        $validated['password'] = bcrypt($validated['password']);
-        $validated['email_verified_at'] = now();
+        $rawPassword = null;
+        if ($generatePassword) {
+            $rawPassword = \Illuminate\Support\Str::random(12);
+            $validated['password'] = bcrypt($rawPassword);
+            $validated['must_change_password'] = true;
+        } else {
+            $validated['password'] = bcrypt($validated['password']);
+            $validated['must_change_password'] = $request->boolean('force_password_change');
+        }
 
-        User::create($validated);
+        $user = User::create($validated);
+
+        // Fire standard Laravel Registered event to trigger email verification notification via Mailpit
+        event(new \Illuminate\Auth\Events\Registered($user));
+
+        $msg = 'User created successfully.';
+        if ($generatePassword) {
+            $msg .= " Generated password: <strong>{$rawPassword}</strong>. Click 'Copy Password' below to copy and dismiss.";
+            session()->flash('alert-copyable-password', $rawPassword);
+        }
 
         return to_route('users.index')->with([
             'alert-type' => 'alert-success',
-            'alert-message' => 'User created successfully',
+            'alert-message' => $msg,
         ]);
     }
 
@@ -279,6 +279,60 @@ class UserController extends Controller
         return to_route('users.index')->with([
             'alert-type' => 'alert-success',
             'alert-message' => 'Simulation ended. Returned to Superadmin context.',
+        ]);
+    }
+
+    public function changePasswordForm()
+    {
+        return view('auth.change_password');
+    }
+
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = auth()->user();
+        $user->password = bcrypt($request->password);
+        $user->must_change_password = false;
+        $user->save();
+
+        return to_route('home')->with([
+            'alert-type' => 'alert-success',
+            'alert-message' => 'Password updated successfully. Welcome to DineFlow!',
+        ]);
+    }
+
+    public function submitSupportInquiry(Request $request)
+    {
+        $request->validate([
+            'inquiry_type' => ['required', 'string', 'in:upgrade_package,bug_report,enhancement,general_idea,other'],
+            'subject' => ['required', 'string', 'max:255'],
+            'message' => ['required', 'string'],
+        ]);
+
+        $user = auth()->user();
+
+        // Retrieve all superadmins
+        $superadmins = User::withoutGlobalScopes()->where('role', 'superadmin')->get();
+
+        if ($superadmins->isEmpty()) {
+            return redirect()->back()->with([
+                'alert-type' => 'alert-danger',
+                'alert-message' => 'No support administrators found. Please try again later.',
+            ]);
+        }
+
+        foreach ($superadmins as $superadmin) {
+            Mail::to($superadmin->email)->send(
+                new SupportInquiryMail($user, $request->inquiry_type, $request->subject, $request->message)
+            );
+        }
+
+        return redirect()->back()->with([
+            'alert-type' => 'alert-success',
+            'alert-message' => 'Your inquiry has been submitted successfully to support!',
         ]);
     }
 }

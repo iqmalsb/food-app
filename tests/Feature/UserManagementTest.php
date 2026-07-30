@@ -248,4 +248,36 @@ class UserManagementTest extends TestCase
 
         $this->assertCount(0, Table::all()); // Table 1 was created in Org 1
     }
+
+    public function test_user_list_livewire_component_renders_and_filters_by_search()
+    {
+        $orgAdmin = User::factory()->create([
+            'role' => 'org_admin',
+            'organisation_id' => $this->org1->id,
+        ]);
+
+        $user1 = User::factory()->create([
+            'name' => 'John Doe',
+            'email' => 'john@example.com',
+            'organisation_id' => $this->org1->id,
+        ]);
+
+        $user2 = User::factory()->create([
+            'name' => 'Jane Smith',
+            'email' => 'jane@example.com',
+            'organisation_id' => $this->org1->id,
+        ]);
+
+        \Livewire\Livewire::actingAs($orgAdmin)
+            ->test(\App\Livewire\UserList::class)
+            ->assertSee('John Doe')
+            ->assertSee('Jane Smith')
+            ->set('search', 'John')
+            ->assertSee('John Doe')
+            ->assertDontSee('Jane Smith')
+            ->call('deleteUser', $user2->id)
+            ->assertDispatched('toast');
+
+        $this->assertSoftDeleted('users', ['id' => $user2->id]);
+    }
 }

@@ -10,7 +10,7 @@ class OrganisationController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'verified', function ($request, $next) {
+        $this->middleware(['auth', function ($request, $next) {
             if ($request->route() && in_array($request->route()->getName(), ['organisation.settings', 'organisation.update-settings'])) {
                 if (in_array(auth()->user()->role, ['superadmin', 'org_admin', 'admin'])) {
                     return $next($request);

@@ -80,17 +80,37 @@
                             @enderror
                         </div>
 
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required>
-                            @error('password')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                        <!-- Password options checkboxes -->
+                        <div class="mb-4">
+                            <label class="form-label">Password Setup Option</label>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" name="generate_password" id="generate_password" value="1" {{ old('generate_password') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="generate_password">
+                                    Auto-generate secure password & force change on login
+                                </label>
+                            </div>
+                            <div class="form-check" id="force-password-change-group">
+                                <input class="form-check-input" type="checkbox" name="force_password_change" id="force_password_change" value="1" {{ old('force_password_change') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="force_password_change">
+                                    Force user to change password on first login
+                                </label>
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            <label for="password_confirmation" class="form-label">Confirm Password</label>
-                            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+                        <!-- Manual Password Input Fields -->
+                        <div id="manual-password-fields">
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required>
+                                @error('password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password_confirmation" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
+                            </div>
                         </div>
 
                         <div class="d-grid gap-2">
@@ -103,27 +123,76 @@
     </div>
 </div>
 
-@if(auth()->user()->role === 'superadmin')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const roleSelect = document.getElementById('role');
-        const orgGroup = document.getElementById('organisation-select-group');
-        const orgSelect = document.getElementById('organisation_id');
+        // Handle Superadmin organization fields toggle
+        @if(auth()->user()->role === 'superadmin')
+            const roleSelect = document.getElementById('role');
+            const orgGroup = document.getElementById('organisation-select-group');
+            const orgSelect = document.getElementById('organisation_id');
 
-        function toggleOrgSelect() {
-            if (roleSelect.value === 'superadmin') {
-                orgSelect.value = '';
-                orgSelect.removeAttribute('required');
-                orgGroup.style.opacity = '0.5';
+            function toggleOrgSelect() {
+                if (roleSelect.value === 'superadmin') {
+                    orgSelect.value = '';
+                    orgSelect.removeAttribute('required');
+                    orgGroup.style.opacity = '0.5';
+                } else {
+                    orgSelect.setAttribute('required', 'required');
+                    orgGroup.style.opacity = '1';
+                }
+            }
+
+            roleSelect.addEventListener('change', toggleOrgSelect);
+            toggleOrgSelect();
+        @endif
+
+        // Handle auto-password generation checkboxes
+        const generatePasswordCheckbox = document.getElementById('generate_password');
+        const forcePasswordCheckbox = document.getElementById('force_password_change');
+        const manualPasswordFields = document.getElementById('manual-password-fields');
+        const passwordInput = document.getElementById('password');
+        const passwordConfirmInput = document.getElementById('password_confirmation');
+
+        function togglePasswordInputs() {
+            if (generatePasswordCheckbox.checked) {
+                manualPasswordFields.style.opacity = '0.5';
+                passwordInput.removeAttribute('required');
+                passwordConfirmInput.removeAttribute('required');
+                passwordInput.value = '';
+                passwordConfirmInput.value = '';
+                passwordInput.disabled = true;
+                passwordConfirmInput.disabled = true;
+
+                forcePasswordCheckbox.checked = true;
+                forcePasswordCheckbox.disabled = true;
+                
+                // Add a hidden input to make sure force_password_change is sent
+                if (!document.getElementById('hidden_force_password_change')) {
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'force_password_change';
+                    hiddenInput.value = '1';
+                    hiddenInput.id = 'hidden_force_password_change';
+                    generatePasswordCheckbox.form.appendChild(hiddenInput);
+                }
             } else {
-                orgSelect.setAttribute('required', 'required');
-                orgGroup.style.opacity = '1';
+                manualPasswordFields.style.opacity = '1';
+                passwordInput.setAttribute('required', 'required');
+                passwordConfirmInput.setAttribute('required', 'required');
+                passwordInput.disabled = false;
+                passwordConfirmInput.disabled = false;
+
+                forcePasswordCheckbox.disabled = false;
+
+                const hiddenInput = document.getElementById('hidden_force_password_change');
+                if (hiddenInput) {
+                    hiddenInput.remove();
+                }
             }
         }
 
-        roleSelect.addEventListener('change', toggleOrgSelect);
-        toggleOrgSelect();
+        generatePasswordCheckbox.addEventListener('change', togglePasswordInputs);
+        togglePasswordInputs();
     });
 </script>
-@endif
 @endsection

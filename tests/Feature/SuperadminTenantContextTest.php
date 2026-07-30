@@ -133,8 +133,8 @@ class SuperadminTenantContextTest extends TestCase
         $response->assertDontSee('Burger');
 
         $response = $this->actingAs($this->superadmin)->get(route('tables.index'));
-        $response->assertSee('T1');
-        $response->assertDontSee('T2');
+        $response->assertSee('<td>T1</td>', false);
+        $response->assertDontSee('<td>T2</td>', false);
 
         // 3. Switch to Org 2
         $this->actingAs($this->superadmin)->post(route('organisations.switch'), [
@@ -150,8 +150,8 @@ class SuperadminTenantContextTest extends TestCase
         $response->assertSee('Burger');
 
         $response = $this->actingAs($this->superadmin)->get(route('tables.index'));
-        $response->assertDontSee('T1');
-        $response->assertSee('T2');
+        $response->assertDontSee('<td>T1</td>', false);
+        $response->assertSee('<td>T2</td>', false);
     }
 
     public function test_superadmin_tenant_context_assigns_organisation_id_on_create()

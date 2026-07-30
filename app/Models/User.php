@@ -35,6 +35,9 @@ class User extends Authenticatable Implements MustVerifyEmail
         'address_city',
         'address_state',
         'address_postcode',
+        'must_change_password',
+        'theme_color',
+        'theme_mode',
     ];
 
     /**
@@ -54,6 +57,7 @@ class User extends Authenticatable Implements MustVerifyEmail
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'must_change_password' => 'boolean',
     ];
 
     public function orders() {
